@@ -3,7 +3,7 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 canvas.addEventListener("click", onClickCanvas, false);
-canvas.addEventListener("touchend", onClickCanvas, false);
+canvas.addEventListener("touchend", onTouchCanvas, false);
 
 var ctx = canvas.getContext;
 
@@ -81,11 +81,26 @@ world.onRender(function(ctx){
 
 function onTouchCanvas(e) {
 
+    var touches = e.changedTouches;
+    for(var i=0; i < e.changedTouches.length; i++) {
+        var touchId = e.changedTouches[i].identifier;
+        var x       = e.changedTouches[i].pageX;
+        var y       = e.changedTouches[i].pageY;
+
+        if (test(lupe, {x:x, y:y}) === 1){
+            console.log("Lupe clicked");
+            lupe.applyImpulse(200, 60);
+        }
+        else {
+            console.log("nope")
+        }
+        
+    }
 }
 
 function onClickCanvas(e) {
 
-    if (test(lupe, e) === 1){
+    if (test(lupe, {x:e.pageX, y:e.pageY}) === 1){
         console.log("Lupe clicked");
         lupe.applyImpulse(200, 60);
     }
@@ -97,7 +112,7 @@ function onClickCanvas(e) {
 function test(sprite, e){
 
     var spritePos = world.canvasPositionAt(lupe.position().x, lupe.position().y);
-    var touch = {x:e.pageX, y:e.pageY};
+    var touch = e;
     var spriteSize = 85;
 
     var rangeX = 0;
