@@ -1,7 +1,9 @@
 var canvas = document.getElementById("game");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+
 canvas.addEventListener("click", onClickCanvas, false);
+canvas.addEventListener("touchend", onClickCanvas, false);
 
 var ctx = canvas.getContext;
 
@@ -76,6 +78,10 @@ world.onRender(function(ctx){
     // ctx.fillStyle = "red";
     // ctx.fill();
 });
+
+function onTouchCanvas(e) {
+
+}
 
 function onClickCanvas(e) {
 
