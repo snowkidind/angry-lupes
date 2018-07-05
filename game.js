@@ -81,6 +81,8 @@ world.onRender(function(ctx){
 
 function onTouchCanvas(e) {
 
+  console.log("test 83" + Object.keys(e));
+
     var touches = e.changedTouches;
     for(var i=0; i < e.changedTouches.length; i++) {
         var touchId = e.changedTouches[i].identifier;
@@ -94,7 +96,6 @@ function onTouchCanvas(e) {
         else {
             console.log("nope")
         }
-        
     }
 }
 
