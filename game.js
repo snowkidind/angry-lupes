@@ -13,66 +13,94 @@ console.log(canvas.width,canvas.height );
 
 var world = boxbox.createWorld(canvas);
 
-// console.log(world.worldPositionAt(0,0));
-// console.log(world.worldPositionAt(canvas.width,canvas.height));
-
 var width = world.worldPositionAt(canvas.width,canvas.height).x;
 var height = world.worldPositionAt(canvas.width,canvas.height).y;
 
+//image is 200px
+var worldImgSize = world.worldPositionAt(100,0).x;
+var clickRange = 100;
 
-var lupe = world.createEntity({
-  name: "player",
-  shape: "circle",
-  radius: 1,
-  image: "lupe.png",
-  imageStretchToFit: true,
-  density: 4,
-  x: width / 10 * 2,
-  onKeyDown: function(e) {
-    this.applyImpulse(200, 60);
-  }
-});
+createElements();
 
-world.createEntity({
-  name: "ground",
-  shape: "square",
-  type: "static",
-  color: "rgb(0,100,0)",
-  width: width,
-  height: .5,
-  x: width / 2,
-  y: height / 10 * 9
-});
+var lupe;
+var ground;
+var wall;
+var blockA;
+var blockB;
+var blockC;
 
-var block = {
-  name: "block",
-  shape: "square",
-  color: "brown",
-  width: .5,
-  height: 4,
-  onImpact: function(entity, force) {
-    if (entity.name() === "player") {
-      this.color("black");
-    }
-  }
-};
+function createElements(){
 
-world.createEntity(block, {
-    x: width / 10 * 6.5,
-    height:  height / 10 * 3
-});
+  ground = world.createEntity({
+        name: "ground",
+        shape: "square",
+        type: "static",
+        color: random_rgb(),
+        width: width,
+        height: height / 10 *2,
+        x: width / 2,
+        y: height / 10 * 8
+    });
 
-world.createEntity(block, {
-    x: width / 10 * 7.5,
-    height:  height / 10 * 3
-});
+    lupe = world.createEntity({
+        name: "player",
+        x: width / 10 * 2,
+        color: "rgb(0,100,0)",
+        shape: "square",
+        width: worldImgSize,
+        height: worldImgSize,
+        image: "bogandoff.png",
+        imageOffsetY: world.worldPositionAt(-75,0).x,
+        // imageStretchToFit: true,
+        density: 1
+    });
 
-world.createEntity(block, {
-  x: width / 10 * 7,
-  y: 1,
-  width: height / 10 * 3,
-  height: .5
-});
+    wall = world.createEntity({
+        name: "rightWall",
+        shape: "square",
+        type: "static",
+        color: "rgb(0,100,0)",
+        width: width / 10 * .01,
+        height: height,
+        x: width / 10 * 10.1
+        //
+    });
+
+    var block = {
+        name: "block",
+        shape: "square",
+        color: "brown",
+        width: .5,
+        height: 4,
+        onImpact: function(entity, force) {
+            if (entity.name() === "player") {
+                this.color("black");
+                impulseText = "es more Safu.."
+            }
+        }
+    };
+
+    blockA = world.createEntity(block, {
+        x: width / 10 * 6.5,
+        y: height / 10 * 3,
+        width: width / 10 * .25,
+        height:  width / 10 * 2
+    });
+
+    blockB = world.createEntity(block, {
+        x: width / 10 * 7.5,
+        y: height / 10 * 3,
+        width: width / 10 * .25,
+        height:  width / 10 * 2
+    });
+
+    blockC = world.createEntity(block, {
+        x: width / 10 * 7,
+        y: 1,
+        width: width / 10 * 2.5,
+        height: 1
+    });
+}
 
 world.onRender(function(ctx){
     // ctx.beginPath();
@@ -81,6 +109,7 @@ world.onRender(function(ctx){
     // ctx.fill();
 });
 
+var impulseText = "No es safu?";
 var lupeSelect = {active:false};
 
 function onTouchStart(e) {
@@ -114,17 +143,21 @@ function onTouchEnd(e) {
         if (lupeSelect.active){
 
             var distanceX = x - lupeSelect.x;
+            var distanceY = y - lupeSelect.y;
 
-
-            var deltaX = lupeSelect.x - x;
-            var deltaY = lupeSelect.y - y;
+            var deltaX = x - lupeSelect.x;
+            var deltaY = y - lupeSelect.y;
             var rad = Math.atan2(deltaY,deltaX);
             var angle = rad * (180 / Math.PI);
 
-
-            console.log(distanceX, angle);
-
-            lupe.applyImpulse(distanceX, angle);
+            if (distanceX > distanceY){
+                lupe.applyImpulse(Math.abs(distanceX) * 2.5, angle - 90);
+                impulseText = Math.abs(distanceX) * 2.5;
+            }
+            else {
+                lupe.applyImpulse(Math.abs(distanceY) * 2.5, angle - 90);
+                impulseText = Math.abs(distanceY) * 2.5;
+            }
 
             lupeSelect = { active:false };
         }
@@ -142,6 +175,7 @@ function onClickStart(e) {
     }
 }
 
+
 function onClickEnd(e){
 
     var x = e.pageX;
@@ -150,16 +184,21 @@ function onClickEnd(e){
     if (lupeSelect.active){
 
         var distanceX = x - lupeSelect.x;
+        var distanceY = y - lupeSelect.y;
 
         var deltaX = x - lupeSelect.x;
         var deltaY = y - lupeSelect.y;
         var rad = Math.atan2(deltaY,deltaX);
         var angle = rad * (180 / Math.PI);
 
-
-        console.log(Math.abs(distanceX), angle);
-
-        lupe.applyImpulse(Math.abs(distanceX) * 2, angle - 90);
+        if (distanceX > distanceY){
+            lupe.applyImpulse(Math.abs(distanceX) * 2.5, angle - 90);
+            impulseText = Math.abs(distanceX) * 2.5;
+        }
+        else {
+            lupe.applyImpulse(Math.abs(distanceY) * 2.5, angle - 90);
+            impulseText = Math.abs(distanceY) * 2.5;
+        }
 
         lupeSelect = { active:false };
     }
@@ -170,7 +209,7 @@ function test(sprite, e){
 
     var spritePos = world.canvasPositionAt(lupe.position().x, lupe.position().y);
     var touch = e;
-    var spriteSize = 85;
+    var spriteSize = clickRange;
 
     var rangeX = 0;
     var rangeY = 0;
@@ -185,4 +224,72 @@ function test(sprite, e){
         return 1;
     }
     else return 0;
+}
+
+function destroyElements(){
+    lupe.destroy();
+    wall.destroy();
+    blockA.destroy();
+    blockB.destroy();
+    blockC.destroy();
+
+}
+
+var chummy;
+
+world.onRender(function(ctx){
+  // console.log(lupe.position().x, lupe.position().y);
+
+    if (lupe.position().x > width || lupe.position().x < 0){
+      // console.log("Out Of X Bounds...");
+      destroyElements();
+      createElements();
+      impulseText = "No es Safu?"
+
+    }
+    else if (lupe.position().y > height || lupe.position().y < 0){
+      // out of y bounds is legal
+      // console.log("Out Of Y Bounds...");
+    }
+
+    if (lupeSelect.active){
+      if (!chummy){
+          chummy = world.createEntity({
+              name: "player",
+              x: width / 10,
+              y: height /10 * 8,
+              type: "static",
+              color: "rgb(0,100,0)",
+              shape: "square",
+              width: worldImgSize,
+              height: worldImgSize,
+              image: "chummy.png",
+
+              // imageStretchToFit: true,
+              density: 1
+          });
+      }
+    }
+    else {
+        if (typeof(chummy) === "object"){
+          chummy.destroy();
+          chummy = '';
+        }
+    }
+
+    ctx.font="30px Verdana";
+    var gradient=ctx.createLinearGradient(0,0, 25,0);
+    gradient.addColorStop("0","magenta");
+    gradient.addColorStop("0.5","blue");
+    gradient.addColorStop("1.0","red");
+
+    // Fill with gradient
+    ctx.fillStyle=gradient;
+    ctx.fillText(impulseText, canvas.width / 10 * 2, canvas.height / 10 * 8);
+
+});
+
+function random_rgb() {
+    var o = Math.round, r = Math.random, s = 255;
+    return 'rgb(' + o(r()*s) + ',' + o(r()*s) + ',' + o(r()*s) + ')';
 }
