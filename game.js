@@ -1,6 +1,8 @@
 var canvas = document.getElementById("game");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+canvas.addEventListener("click", onClickCanvas, false);
+
 var ctx = canvas.getContext;
 
 console.log(canvas.width,canvas.height );
@@ -74,3 +76,35 @@ world.onRender(function(ctx){
     // ctx.fillStyle = "red";
     // ctx.fill();
 });
+
+function onClickCanvas(e) {
+
+    if (test(lupe, e) === 1){
+        console.log("Lupe clicked");
+        lupe.applyImpulse(200, 60);
+    }
+    else {
+        console.log("nope")
+    }
+}
+
+function test(sprite, e){
+
+    var spritePos = world.canvasPositionAt(lupe.position().x, lupe.position().y);
+    var touch = {x:e.pageX, y:e.pageY};
+    var spriteSize = 85;
+
+    var rangeX = 0;
+    var rangeY = 0;
+
+    if (touch.x >= spritePos.x - spriteSize/2 && touch.x <= spritePos.x + spriteSize/2){
+        rangeX = 1;
+    }
+    if (touch.y >= spritePos.y - spriteSize/2 && touch.y <= spritePos.y + spriteSize/2){
+        rangeY = 1;
+    }
+    if (rangeX === 1 && rangeY === 1){
+        return 1;
+    }
+    else return 0;
+}
