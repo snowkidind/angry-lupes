@@ -2,8 +2,10 @@ var canvas = document.getElementById("game");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-canvas.addEventListener("click", onClickCanvas, false);
-canvas.addEventListener("touchend", onTouchCanvas, false);
+canvas.addEventListener("mousedown", onClickStart, false);
+canvas.addEventListener("mouseup", onClickEnd, false);
+canvas.addEventListener("touchstart", onTouchStart, false);
+canvas.addEventListener("touchend", onTouchEnd, false);
 
 var ctx = canvas.getContext;
 
@@ -79,9 +81,9 @@ world.onRender(function(ctx){
     // ctx.fill();
 });
 
-function onTouchCanvas(e) {
+var lupeSelect = {active:false};
 
-  console.log("test 83" + Object.keys(e));
+function onTouchStart(e) {
 
     var touches = e.changedTouches;
     for(var i=0; i < e.changedTouches.length; i++) {
@@ -90,24 +92,78 @@ function onTouchCanvas(e) {
         var y       = e.changedTouches[i].pageY;
 
         if (test(lupe, {x:x, y:y}) === 1){
-            console.log("Lupe clicked");
-            lupe.applyImpulse(200, 60);
+            console.log("Lupe selected");
+            lupeSelect = {x:x, y:y, active:true};
         }
         else {
+
+            lupeSelect = {active:false};
             console.log("nope")
         }
     }
 }
 
-function onClickCanvas(e) {
+function onTouchEnd(e) {
 
+    var touches = e.changedTouches;
+    for(var i=0; i < e.changedTouches.length; i++) {
+        var touchId = e.changedTouches[i].identifier;
+        var x       = e.changedTouches[i].pageX;
+        var y       = e.changedTouches[i].pageY;
+
+        if (lupeSelect.active){
+
+            var distanceX = x - lupeSelect.x;
+
+
+            var deltaX = lupeSelect.x - x;
+            var deltaY = lupeSelect.y - y;
+            var rad = Math.atan2(deltaY,deltaX);
+            var angle = rad * (180 / Math.PI);
+
+
+            console.log(distanceX, angle);
+
+            lupe.applyImpulse(distanceX, angle);
+
+            lupeSelect = { active:false };
+        }
+    }
+}
+
+function onClickStart(e) {
     if (test(lupe, {x:e.pageX, y:e.pageY}) === 1){
         console.log("Lupe clicked");
-        lupe.applyImpulse(200, 60);
+        lupeSelect = {x:e.pageX, y:e.pageY, active:true};
     }
     else {
+        lupeSelect = {active:false};
         console.log("nope")
     }
+}
+
+function onClickEnd(e){
+
+    var x = e.pageX;
+    var y = e.pageY;
+
+    if (lupeSelect.active){
+
+        var distanceX = x - lupeSelect.x;
+
+        var deltaX = x - lupeSelect.x;
+        var deltaY = y - lupeSelect.y;
+        var rad = Math.atan2(deltaY,deltaX);
+        var angle = rad * (180 / Math.PI);
+
+
+        console.log(Math.abs(distanceX), angle);
+
+        lupe.applyImpulse(Math.abs(distanceX) * 2, angle - 90);
+
+        lupeSelect = { active:false };
+    }
+
 }
 
 function test(sprite, e){
