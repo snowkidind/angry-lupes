@@ -131,7 +131,9 @@ Created at Bocoup http://bocoup.com
         allowSleep: true,
         scale: 30,
         tickFrequency: 50,
-        collisionOutlines: false
+        collisionOutlines: false,
+        // debugDraw: true
+
     };
     
     var JOINT_DEFAULT_OPTIONS = {
@@ -165,7 +167,7 @@ Created at Bocoup http://bocoup.com
         _onTick: [],
         _creationQueue: [],
         _positionQueue: [],
-        
+
         _init: function(canvasElem, options) {
             var self = this;
             var key;
@@ -183,7 +185,7 @@ Created at Bocoup http://bocoup.com
             
             // Set up rendering on the provided canvas
             if (this._canvas !== undefined) {
-                
+
                 // debug rendering
                 if (this._ops.debugDraw) {
                     var debugDraw = new b2DebugDraw();
@@ -1002,7 +1004,8 @@ Created at Bocoup http://bocoup.com
                 body.type = b2Body.b2_staticBody;
             }
             else if (ops.type === 'dynamic') {
-                body.type = b2Body.b2_dynamicBody;
+                 body.type = b2Body.b2_dynamicBody;
+                //body.type = b2Body.b2_kinematicBody;
             }
             
             // shape
@@ -1124,7 +1127,8 @@ Created at Bocoup http://bocoup.com
             var p = this._body.GetPosition();
             return {x: p.x, y: p.y};
         },
-        
+
+
         /**
          * @_module entity
          * @_params
@@ -1156,7 +1160,11 @@ Created at Bocoup http://bocoup.com
             }
             return this._body.GetAngle() * DEGREES_PER_RADIAN;
         },
-        
+
+        stopRotation: function() {
+            this._body.SetAngle(0);
+        },
+
         /**
          * @_module entity
          * @_params [value]
